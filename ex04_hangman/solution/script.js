@@ -1,4 +1,4 @@
-const randomWords = [
+/*const randomWords = [
   'condition',
   'bottom',
   'lineage',
@@ -49,7 +49,7 @@ const randomWords = [
   'consider',
   'other',
   'prospect',
-];
+];*/
 const hangManImage = document.querySelector('#image');
 const solutionContainer = document.querySelector('#solution-container');
 const winOrLoseContainer = document.querySelector('#win-lose-container');
@@ -98,8 +98,8 @@ function updateHangmanPicture() {
 }
 
 
-function initGameState() {
-  gameState.word = selectRandomWord();
+function initGameState(newWord) {
+  gameState.word = newWord;
   gameState.hangman = 1;
   gameState.turn = 1;
   gameState.lettersFound = 0;
@@ -149,7 +149,28 @@ function letterClicked(event) {
   }
 }
 
-initGameState();
+
+
+function newWordRequest() {
+  const request = new XMLHttpRequest();
+  request.addEventListener('readystatechange', function(event){
+  if (request.readyState === 4) {
+    console.log(request.status);
+    if (request.status >= 200 && request.status < 300) {
+      const response = JSON.parse(request.responseText);
+      const NewWord = response.random_word.split('');
+      initGameState(NewWord)
+    } else {
+      console.log('error');
+    }
+  }
+  });
+  request.open('GET', 'http://connect4.pienter.space/api/random_word');
+  request.send();
+}
+
+
+newWordRequest();
 
 letterContainer.addEventListener('click', letterClicked);
-winOrLoseContainer.addEventListener('click', initGameState);
+winOrLoseContainer.addEventListener('click', newWordRequest);
